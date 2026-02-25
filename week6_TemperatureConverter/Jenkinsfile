@@ -79,7 +79,7 @@ pipeline {
 
         stage('Test Docker Image') {
             steps {
-                sh "docker run --rm ${DOCKER_IMAGE}:${DOCKER_TAG} echo 'Docker image runs successfully!'" 
+                sh "echo '1\n100\n4' | docker run -i --rm ${DOCKER_IMAGE}:${DOCKER_TAG}" 
             }
         }
 
