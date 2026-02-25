@@ -8,6 +8,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'luliu06/week6-temperature-converter'
         DOCKER_TAG = 'latest'
+        PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
     }
 
     stages {
