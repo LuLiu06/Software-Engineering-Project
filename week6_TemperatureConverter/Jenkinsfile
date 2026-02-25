@@ -1,0 +1,111 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+        jdk 'JDK21'
+    }
+
+    environment {
+        DOCKER_IMAGE = 'luliu06/week6-temperature-converter'
+        DOCKER_TAG = 'latest'
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('week6_TemperatureConverter') {
+                    sh 'mvn clean compile'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('week6_TemperatureConverter') {
+                    sh 'mvn test'
+                }
+            }
+            post {
+                always {
+                    dir('week6_TemperatureConverter') {
+                        junit 'target/surefire-reports/*.xml'
+                    }
+                }
+            }
+        }
+
+        stage('JaCoCo Report') {
+            steps {
+                dir('week6_TemperatureConverter') {
+                    sh 'mvn verify'
+                }
+            }
+            post {
+                always {
+                    dir('week6_TemperatureConverter') {
+                        jacoco(
+                            execPattern: 'target/jacoco.exec',
+                            classPattern: 'target/classes',
+                            sourcePattern: 'src/main/java',
+                            exclusionPattern: 'src/test*'
+                        )
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                dir('week6_TemperatureConverter') {
+                    sh 'mvn package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('week6_TemperatureConverter') {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                }
+            }
+        }
+
+        stage('Test Docker Image') {
+            steps {
+                sh "docker run --rm ${DOCKER_IMAGE}:${DOCKER_TAG} echo 'Docker image runs successfully!'" 
+            }
+        }
+
+        stage('Push to Docker Hub (Optional)') {
+            when {
+                expression { return false }  // Set to true to enable push
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed!'
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
+
