@@ -7,48 +7,96 @@ public class Main {
         TemperatureConverter converter = new TemperatureConverter();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== Temperature Converter ===");
-        System.out.println("1. Fahrenheit to Celsius");
-        System.out.println("2. Celsius to Fahrenheit");
-        System.out.println("3. Kelvin to Celsius");
-        System.out.print("Choose option (1-3): ");
+        System.out.println("╔════════════════════════════════════════╗");
+        System.out.println("║     TEMPERATURE CONVERTER v1.0         ║");
+        System.out.println("║     Week 6 - Docker Assignment         ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.println();
 
-        int choice = scanner.nextInt();
-        System.out.print("Enter temperature: ");
-        double temp = scanner.nextDouble();
+        boolean continueRunning = true;
 
-        double result;
-        String output;
+        while (continueRunning) {
+            System.out.println("Available conversions:");
+            System.out.println("  1. Fahrenheit to Celsius");
+            System.out.println("  2. Celsius to Fahrenheit");
+            System.out.println("  3. Kelvin to Celsius");
+            System.out.println("  4. Exit");
+            System.out.println();
+            System.out.print("Choose option (1-4): ");
 
-        switch (choice) {
-            case 1:
-                result = converter.fahrenheitToCelsius(temp);
-                output = String.format("%.2f°F = %.2f°C", temp, result);
-                break;
-            case 2:
-                result = converter.celsiusToFahrenheit(temp);
-                output = String.format("%.2f°C = %.2f°F", temp, result);
-                break;
-            case 3:
-                result = converter.kelvinToCelsius(temp);
-                output = String.format("%.2fK = %.2f°C", temp, result);
-                break;
-            default:
-                output = "Invalid option";
-        }
+            int choice = scanner.nextInt();
 
-        System.out.println(output);
-
-        if (choice >= 1 && choice <= 3) {
-            double celsius = (choice == 1) ? converter.fahrenheitToCelsius(temp) :
-                             (choice == 2) ? temp :
-                             converter.kelvinToCelsius(temp);
-            if (converter.isExtremeTemperature(celsius)) {
-                System.out.println("Warning: This is an extreme temperature!");
+            if (choice == 4) {
+                System.out.println();
+                System.out.println("Thank you for using Temperature Converter!");
+                System.out.println("Goodbye!");
+                continueRunning = false;
+                continue;
             }
+
+            if (choice < 1 || choice > 3) {
+                System.out.println("Invalid option. Please try again.");
+                System.out.println();
+                continue;
+            }
+
+            System.out.print("Enter temperature value: ");
+            double temp = scanner.nextDouble();
+
+            double result;
+            String output;
+
+            switch (choice) {
+                case 1:
+                    result = converter.fahrenheitToCelsius(temp);
+                    output = String.format("%.2f°F = %.2f°C", temp, result);
+                    System.out.println();
+                    System.out.println("Converting Fahrenheit to Celsius...");
+                    System.out.println("Result: " + output);
+                    break;
+                case 2:
+                    result = converter.celsiusToFahrenheit(temp);
+                    output = String.format("%.2f°C = %.2f°F", temp, result);
+                    System.out.println();
+                    System.out.println("Converting Celsius to Fahrenheit...");
+                    System.out.println("Result: " + output);
+                    break;
+                case 3:
+                    result = converter.kelvinToCelsius(temp);
+                    output = String.format("%.2fK = %.2f°C", temp, result);
+                    System.out.println();
+                    System.out.println("Converting Kelvin to Celsius...");
+                    System.out.println("Result: " + output);
+                    break;
+                default:
+                    result = 0;
+            }
+
+            // Check for extreme temperature
+            double celsius;
+            switch (choice) {
+                case 1:
+                    celsius = converter.fahrenheitToCelsius(temp);
+                    break;
+                case 2:
+                    celsius = temp;
+                    break;
+                case 3:
+                    celsius = converter.kelvinToCelsius(temp);
+                    break;
+                default:
+                    celsius = 0;
+            }
+
+            if (converter.isExtremeTemperature(celsius)) {
+                System.out.println("⚠️  WARNING: This is an extreme temperature!");
+            }
+
+            System.out.println();
+            System.out.println("----------------------------------------");
+            System.out.println();
         }
 
         scanner.close();
     }
 }
-
