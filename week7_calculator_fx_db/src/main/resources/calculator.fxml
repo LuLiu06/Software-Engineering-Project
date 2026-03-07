@@ -20,6 +20,6 @@
 
     <Button text="Calculate All (Sum, Product, Subtract, Divide)" onAction="#onCalculateClick"/>
 
-    <Label fx:id="resultLabel" style="-fx-font-size: 12px;"/>
+    <Label fx:id="resultLabel" style="-fx-font-size: 12px;" wrapText="true" minHeight="50"/>
 
 </VBox>

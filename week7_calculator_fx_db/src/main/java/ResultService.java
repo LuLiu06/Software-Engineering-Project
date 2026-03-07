@@ -20,8 +20,17 @@ public class ResultService {
         return host;
     }
 
+    private static int getDatabasePort() {
+        String port = System.getenv("DB_PORT");
+        if (port == null || port.isEmpty()) {
+            String host = getDatabaseHost();
+            return host.equals("localhost") ? 3307 : 3306;
+        }
+        return Integer.parseInt(port);
+    }
+
     private static String getDatabaseUrl() {
-        return "jdbc:mariadb://" + getDatabaseHost() + ":3306/" + DB_NAME +
+        return "jdbc:mariadb://" + getDatabaseHost() + ":" + getDatabasePort() + "/" + DB_NAME +
                 "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     }
 
