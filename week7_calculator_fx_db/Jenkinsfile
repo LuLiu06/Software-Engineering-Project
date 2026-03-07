@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        DOCKER_IMAGE = 'lululuminous/week7-calculator-fx-db'
+        DOCKER_TAG = 'latest'
+        PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('week7_calculator_fx_db') {
+                    sh 'mvn clean compile'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                dir('week7_calculator_fx_db') {
+                    sh 'mvn package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('week7_calculator_fx_db') {
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed!'
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
